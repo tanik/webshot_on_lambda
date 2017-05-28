@@ -19,7 +19,7 @@ exports.handler = (event, context, callback) => {
     exec(`LD_LIBRARY_PATH=${fontPath}  ${phantom} ${scriptPath} ${event.url}`, (error, stdout, stderr) => {
       if (error) {
         const resp = {state: "failure", message: `phantom exec error: ${error}, stdout: ${stdout}, stderr: ${stderr}`}
-        callback(error, JSON.stringify(resp))
+        callback(error, resp)
         return
       }
       const title = fs.readFileSync('/tmp/title.txt', 'utf-8')
@@ -35,18 +35,19 @@ exports.handler = (event, context, callback) => {
       new aws.S3().upload(params, (error, data) => {
         if (error) {
           const resp = {state: "failure", message: `image upload error: ${error}`}
-          callback(error, JSON.stringify(resp));
+          callback(error, resp);
           return
         }
         const thumb_path = '/tmp/thumb.png';
         const resized_path = '/tmp/thumb_resized.png';
+        sharp.cache(false)
         sharp(thumb_path)
           .resize(200, 200)
           .max()
           .toFile(resized_path, (error) => {
             if (error) {
               const resp = {state: "failure", message: `resize error: ${error}`}
-              callback(error, JSON.stringify(resp));
+              callback(error, resp);
               return
             }
             const params = {
@@ -60,7 +61,7 @@ exports.handler = (event, context, callback) => {
             new aws.S3().upload(params, (error, data) => {
               if (error) {
                 const resp = {state: "failure", message: `thumbnail upload error: ${error}`}
-                callback(error, JSON.stringify(resp));
+                callback(error, resp);
               }else{
                 const resp = {
                   state: "success",
@@ -68,7 +69,7 @@ exports.handler = (event, context, callback) => {
                   image: `websites/images/${event.id}.png`,
                   thumbnail: `websites/thumbnails/${event.id}.png`,
                 }
-                callback(error, JSON.stringify(resp))
+                callback(error, resp)
               }
             });
           })
