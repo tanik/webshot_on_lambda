@@ -6,6 +6,9 @@ page.viewportSize = { width: 1280, height: 800 };
 page.settings.userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36';
 page.settings.javascriptEnabled = true;
 page.settings.loadImages = true;
+page.customHeaders = {
+  'Accept-Language': 'ja,en-US;q=0.8,en;q=0.6'
+}
 phantom.cookiesEnabled = true;
 page.open(args[1], function(status) {
   if(status !== 'success'){
@@ -16,9 +19,7 @@ page.open(args[1], function(status) {
       return document.title;
     });
     fs.write("/tmp/title.txt", title, 'w');
-    console.log("title: " + title);
     page.render('/tmp/full.png');
-    console.log("render full");
     page.clipRect = {
       top: 0,
       left: 0,
@@ -26,7 +27,6 @@ page.open(args[1], function(status) {
       height: 800
     };
     page.render('/tmp/thumb.png');
-    console.log("render thumb");
     phantom.exit();
   }
 });
