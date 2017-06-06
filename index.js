@@ -7,7 +7,6 @@ const sharp = require('sharp')
 const phantom = path.join(__dirname, "node_modules/phantomjs-prebuilt/bin/phantomjs")
 const exec = require("child_process").exec;
 
-const bucket = 'img.m-ch.xyz'
 exports.handler = (event, context, callback) => {
   exec("rm -rf /tmp/fontconfig; cp -r fontconfig /tmp/.; /tmp/fontconfig/usr/bin/fc-cache -fs", (error, stdout, stderr) => {
     if(error){
@@ -25,7 +24,7 @@ exports.handler = (event, context, callback) => {
       const title = fs.readFileSync('/tmp/title.txt', 'utf-8')
       const image_path = '/tmp/full.png';
       const params = {
-        Bucket: bucket,
+        Bucket: event.bucket,
         Key: `websites/images/${event.id}.png`,
         Body: fs.createReadStream(image_path),
         ContentType: "image/png",
@@ -51,7 +50,7 @@ exports.handler = (event, context, callback) => {
               return
             }
             const params = {
-              Bucket: bucket,
+              Bucket: event.bucket,
               Key: `websites/thumbnails/${event.id}.png`,
               Body: fs.createReadStream(resized_path),
               ContentType: "image/png",
